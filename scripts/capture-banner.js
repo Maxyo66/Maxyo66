@@ -1,5 +1,5 @@
 const { chromium } = require('playwright');
-const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.DPR || 1.5, N = +process.env.N || 165, OUT = process.env.OUT || 'f', SINGLE = process.env.SINGLE;
+const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.DPR || 1.5, N = +process.env.N || 165, FPS = 15, OUT = process.env.OUT || 'f', SINGLE = process.env.SINGLE;
 (async () => {
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: DPR });
@@ -8,7 +8,8 @@ const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.D
   await p.clock.runFor(2500);
   await p.getByRole('button', { name: 'ASCII' }).first().click();
   await p.getByRole('button', { name: 'Hide text' }).first().click();
-  await p.clock.runFor(4000);
+  await p.mouse.move(-50, -50);  // park the cursor; sharks follow or circle a recent cursor and bolt from clicks
+  await p.clock.runFor(22000);   // let cursor-follow (16 s) and click alarms wear off before recording
   await p.evaluate(() => {
     const css = document.createElement('style');
     css.textContent = `header, nav.gauge, .intro, .resurface, .specimen, aside, main, section { visibility: hidden !important; }
@@ -26,7 +27,7 @@ const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.D
   for (let i = 0; i < N; i++) {
     await p.screenshot({ path: `${OUT}/${String(i).padStart(4, '0')}.png` });
     if (SINGLE) break;
-    await p.clock.runFor(+process.env.STEP || 32);  // whole rAF ticks (16 ms) per frame so motion is even
+    await p.clock.runFor(+process.env.STEP || 16);  // whole rAF ticks (16 ms) per frame so motion is even
   }
   await b.close();
 })();

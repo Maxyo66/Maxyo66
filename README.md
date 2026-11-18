@@ -1,5 +1,5 @@
 <a href="https://maxyo66.github.io">
-  <img src="assets/sharks.webp" width="100%" alt="Maxyo66. Hey, I'm Max, a game developer from Florida. ASCII sharks drawn in kana characters swim through kelp and coral behind the name. Click to dive into the portfolio.">
+  <img src="assets/sharks.webp?v=3" width="100%" alt="Maxyo66. Hey, I'm Max, a game developer from Florida. ASCII sharks drawn in kana characters swim through kelp and coral behind the name. Click to dive into the portfolio.">
 </a>
 
 I make games and build the tools I use to make them. Every project runs like a small studio: me plus a crew of AI models, each with its own job.
