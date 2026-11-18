@@ -1,14 +1,16 @@
 const { chromium } = require('playwright');
-const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.DPR || 1.5, N = +process.env.N || 165, OUT = process.env.OUT || 'f', SINGLE = process.env.SINGLE;
+const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.DPR || 1.5, N = +process.env.N || 165, FPS = 15, OUT = process.env.OUT || 'f', SINGLE = process.env.SINGLE;
 (async () => {
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: DPR });
-  await p.clock.install();
+  await p.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+  await p.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));  // freeze wall-clock time: only runFor moves the ocean, never screenshot time
   await p.goto('http://localhost:8765/', { waitUntil: 'load' });
   await p.clock.runFor(2500);
-  await p.getByRole('button', { name: 'ASCII' }).first().click();
-  await p.getByRole('button', { name: 'Hide text' }).first().click();
-  await p.clock.runFor(4000);
+  await p.getByRole('button', { name: 'ASCII' }).first().dispatchEvent('click');  // synthetic click: no pointer, so no cursor for the sharks to react to
+  await p.getByRole('button', { name: 'Hide text' }).first().dispatchEvent('click');  // synthetic click: no pointer, so no cursor for the sharks to react to
+  await p.mouse.move(-50, -50);  // park the cursor; sharks follow or circle a recent cursor and bolt from clicks
+  await p.clock.runFor(8000);   // let any click reactions wear off before recording
   await p.evaluate(() => {
     const css = document.createElement('style');
     css.textContent = `header, nav.gauge, .intro, .resurface, .specimen, aside, main, section { visibility: hidden !important; }
