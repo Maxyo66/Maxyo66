@@ -1,5 +1,5 @@
 const { chromium } = require('playwright');
-const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.DPR || 1.5, N = +process.env.N || 165, FPS = 15, OUT = process.env.OUT || 'f', SINGLE = process.env.SINGLE;
+const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.DPR || 1.5, N = +process.env.N || 165, OUT = process.env.OUT || 'f', SINGLE = process.env.SINGLE;
 (async () => {
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: DPR });
@@ -26,7 +26,7 @@ const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.D
   for (let i = 0; i < N; i++) {
     await p.screenshot({ path: `${OUT}/${String(i).padStart(4, '0')}.png` });
     if (SINGLE) break;
-    await p.clock.runFor(1000 / FPS);
+    await p.clock.runFor(+process.env.STEP || 32);  // whole rAF ticks (16 ms) per frame so motion is even
   }
   await b.close();
 })();
