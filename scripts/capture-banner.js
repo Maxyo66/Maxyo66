@@ -3,13 +3,14 @@ const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.D
 (async () => {
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: DPR });
-  await p.clock.install();
+  await p.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+  await p.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));  // freeze wall-clock time: only runFor moves the ocean, never screenshot time
   await p.goto('http://localhost:8765/', { waitUntil: 'load' });
   await p.clock.runFor(2500);
-  await p.getByRole('button', { name: 'ASCII' }).first().click();
-  await p.getByRole('button', { name: 'Hide text' }).first().click();
+  await p.getByRole('button', { name: 'ASCII' }).first().dispatchEvent('click');  // synthetic click: no pointer, so no cursor for the sharks to react to
+  await p.getByRole('button', { name: 'Hide text' }).first().dispatchEvent('click');  // synthetic click: no pointer, so no cursor for the sharks to react to
   await p.mouse.move(-50, -50);  // park the cursor; sharks follow or circle a recent cursor and bolt from clicks
-  await p.clock.runFor(22000);   // let cursor-follow (16 s) and click alarms wear off before recording
+  await p.clock.runFor(8000);   // let any click reactions wear off before recording
   await p.evaluate(() => {
     const css = document.createElement('style');
     css.textContent = `header, nav.gauge, .intro, .resurface, .specimen, aside, main, section { visibility: hidden !important; }
@@ -27,7 +28,7 @@ const W = +process.env.W || 960, H = +process.env.H || 320, DPR = +process.env.D
   for (let i = 0; i < N; i++) {
     await p.screenshot({ path: `${OUT}/${String(i).padStart(4, '0')}.png` });
     if (SINGLE) break;
-    await p.clock.runFor(+process.env.STEP || 16);  // whole rAF ticks (16 ms) per frame so motion is even
+    await p.clock.runFor(+process.env.STEP || 32);  // whole rAF ticks (16 ms) per frame so motion is even
   }
   await b.close();
 })();
